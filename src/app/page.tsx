@@ -22,6 +22,8 @@ type Member = {
 type NotificationState = NotificationPermission | "unsupported";
 
 const matchFee = 50_000;
+const storageKey = "hbt-football-app-v2";
+const legacyStorageKey = "hbt-football-app";
 const currency = new Intl.NumberFormat("vi-VN", {
   style: "currency",
   currency: "VND",
@@ -61,68 +63,6 @@ function makeAvatar(name: string, index = 0) {
 
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
-
-const starterMembers: Member[] = [
-  {
-    id: "minh-quan",
-    name: "Nguyễn Minh Quân",
-    birthday: "2001-05-20",
-    avatar: makeAvatar("Nguyễn Minh Quân", 0),
-    paidAmount: 100_000,
-    payments: [
-      {
-        id: "p-1",
-        amount: 50_000,
-        createdAt: "2026-05-01",
-        note: "Trận đầu tháng",
-      },
-      {
-        id: "p-2",
-        amount: 50_000,
-        createdAt: "2026-05-08",
-        note: "Cộng dồn trận sau",
-      },
-    ],
-  },
-  {
-    id: "hoang-anh",
-    name: "Trần Hoàng Anh",
-    birthday: "2000-09-12",
-    avatar: makeAvatar("Trần Hoàng Anh", 1),
-    paidAmount: 50_000,
-    payments: [
-      {
-        id: "p-3",
-        amount: 50_000,
-        createdAt: "2026-05-01",
-        note: "Đã đóng 1 trận",
-      },
-    ],
-  },
-  {
-    id: "duc-hai",
-    name: "Phạm Đức Hải",
-    birthday: "1999-12-04",
-    avatar: makeAvatar("Phạm Đức Hải", 2),
-    paidAmount: 0,
-    payments: [],
-  },
-  {
-    id: "gia-huy",
-    name: "Lê Gia Huy",
-    birthday: "2002-02-18",
-    avatar: makeAvatar("Lê Gia Huy", 3),
-    paidAmount: 150_000,
-    payments: [
-      {
-        id: "p-4",
-        amount: 150_000,
-        createdAt: "2026-05-10",
-        note: "Đóng trước 3 trận",
-      },
-    ],
-  },
-];
 
 function parseDateParts(value: string) {
   const [year, month, day] = value.split("-").map(Number);
@@ -174,10 +114,10 @@ async function registerServiceWorker() {
 }
 
 export default function Home() {
-  const [members, setMembers] = useState<Member[]>(starterMembers);
-  const [query, setQuery] = useState("Nguyễn Minh Quân");
+  const [members, setMembers] = useState<Member[]>([]);
+  const [query, setQuery] = useState("");
   const [matchCount, setMatchCount] = useState(2);
-  const [selectedMemberId, setSelectedMemberId] = useState(starterMembers[0].id);
+  const [selectedMemberId, setSelectedMemberId] = useState("");
   const [paymentAmount, setPaymentAmount] = useState(matchFee);
   const [paymentNote, setPaymentNote] = useState("Đóng thêm 1 trận");
   const [hasLoadedData, setHasLoadedData] = useState(false);
@@ -193,7 +133,8 @@ export default function Home() {
   });
 
   useEffect(() => {
-    const saved = window.localStorage.getItem("hbt-football-app");
+    window.localStorage.removeItem(legacyStorageKey);
+    const saved = window.localStorage.getItem(storageKey);
     const parsed = saved
       ? (JSON.parse(saved) as {
           members?: Member[];
@@ -227,7 +168,7 @@ export default function Home() {
     }
 
     window.localStorage.setItem(
-      "hbt-football-app",
+      storageKey,
       JSON.stringify({ members, matchCount }),
     );
   }, [hasLoadedData, members, matchCount]);
@@ -447,26 +388,26 @@ export default function Home() {
   }
 
   return (
-    <main className="app-background min-h-screen overflow-hidden px-4 py-5 text-slate-950 sm:px-6 lg:px-10">
+    <main className="app-background min-h-screen overflow-hidden px-3 py-4 text-slate-950 sm:px-6 sm:py-6 lg:px-10">
       <div className="background-overlay pointer-events-none fixed inset-0" />
 
       <section className="app-shell relative mx-auto">
         <header className="hero-card">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="hero-content flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-sm font-black uppercase tracking-[0.24em] text-orange-100">
                 Đoàn kết Hai Bà Trưng
               </p>
-              <h1 className="mt-3 text-4xl font-black tracking-[-0.06em] text-white sm:text-5xl">
+              <h1 className="hero-title mt-3 font-black tracking-[-0.06em] text-white">
                 Quản lý đội bóng gọn như một app mobile
               </h1>
-              <p className="mt-4 max-w-xl text-base font-medium leading-7 text-white/75">
+              <p className="hero-description mt-4 max-w-xl font-medium leading-7 text-white/75">
                 Tìm ngày sinh, xem ảnh thành viên, cộng dồn tiền sân và nhận
                 nhắc sinh nhật ngay trên máy đang dùng.
               </p>
             </div>
 
-            <div className="grid grid-cols-3 gap-3 text-white sm:min-w-[420px]">
+            <div className="metrics-grid grid gap-3 text-white">
               <div className="metric-card">
                 <span>Quỹ đã thu</span>
                 <strong>{currency.format(totalPaid)}</strong>
@@ -569,13 +510,16 @@ export default function Home() {
                 </button>
               </div>
 
-              <div className="mt-5 grid gap-3 md:grid-cols-4">
+              <div className="payment-form mt-5 grid gap-3">
                 <label className="field">
                   <span>Người đóng</span>
                   <select
                     value={selectedMemberId}
                     onChange={(event) => setSelectedMemberId(event.target.value)}
                   >
+                    {members.length === 0 ? (
+                      <option value="">Chưa có cầu thủ</option>
+                    ) : null}
                     {members.map((member) => (
                       <option key={member.id} value={member.id}>
                         {member.name}
@@ -600,7 +544,7 @@ export default function Home() {
                     onChange={(event) => setPaymentNote(event.target.value)}
                   />
                 </label>
-                <button className="primary-button md:mt-6" onClick={addPayment}>
+                <button className="primary-button" onClick={addPayment}>
                   Cộng tiền
                 </button>
               </div>
@@ -710,6 +654,11 @@ export default function Home() {
           </div>
 
           <div className="mt-5 grid gap-3">
+            {members.length === 0 ? (
+              <div className="empty-state">
+                Chưa có cầu thủ nào. Hãy thêm cầu thủ mới để bắt đầu lưu dữ liệu.
+              </div>
+            ) : null}
             {members.map((member) => {
               const missing = Math.max(0, expectedAmount - member.paidAmount);
               const isDone = missing === 0;

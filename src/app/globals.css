@@ -12,6 +12,14 @@
   --font-mono: var(--font-geist-mono);
 }
 
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -22,6 +30,7 @@ button,
 input,
 select {
   font: inherit;
+  min-width: 0;
 }
 
 button {
@@ -56,6 +65,21 @@ button {
   position: relative;
 }
 
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-title {
+  max-width: 12ch;
+  font-size: clamp(2.05rem, 7vw, 3.35rem);
+  line-height: 0.98;
+}
+
+.hero-description {
+  font-size: clamp(0.95rem, 2vw, 1rem);
+}
+
 .hero-card::after {
   content: "";
   position: absolute;
@@ -64,6 +88,11 @@ button {
   height: 22rem;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.16);
+}
+
+.metrics-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-width: min(100%, 420px);
 }
 
 .metric-card {
@@ -84,7 +113,8 @@ button {
 .metric-card strong {
   display: block;
   margin-top: 0.35rem;
-  font-size: clamp(1rem, 2.8vw, 1.45rem);
+  overflow-wrap: anywhere;
+  font-size: clamp(0.96rem, 2.8vw, 1.45rem);
   font-weight: 950;
   letter-spacing: -0.04em;
 }
@@ -108,6 +138,12 @@ button {
     linear-gradient(135deg, #ffffff, #eef6ff);
   padding: 1.25rem;
   box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.72);
+}
+
+.member-spotlight h3 {
+  overflow-wrap: anywhere;
+  font-size: clamp(1.7rem, 4vw, 2.1rem);
+  line-height: 1.05;
 }
 
 .eyebrow {
@@ -137,6 +173,7 @@ button {
   font-weight: 900;
   color: white;
   box-shadow: 0 14px 30px rgba(109, 93, 252, 0.26);
+  text-align: center;
   transition:
     transform 180ms ease,
     box-shadow 180ms ease,
@@ -242,6 +279,7 @@ button {
   padding: 0 1rem;
   color: #0f172a;
   outline: none;
+  min-width: 0;
   transition:
     border-color 180ms ease,
     box-shadow 180ms ease,
@@ -280,15 +318,24 @@ button {
   box-shadow: inset 0 0 0 1px rgba(255, 237, 213, 0.9);
 }
 
+.payment-form {
+  grid-template-columns: minmax(180px, 1.1fr) minmax(130px, 0.75fr) minmax(180px, 1fr) auto;
+  align-items: end;
+}
+
 .payment-row {
   display: grid;
-  grid-template-columns: minmax(280px, 1.45fr) repeat(3, minmax(135px, 0.75fr)) auto auto;
+  grid-template-columns: minmax(260px, 1.55fr) repeat(3, minmax(118px, 0.72fr)) minmax(82px, auto) minmax(66px, auto);
   align-items: center;
-  gap: 1rem;
+  gap: 0.9rem;
   border-radius: 1.35rem;
   background: white;
   padding: 1rem;
   box-shadow: inset 0 0 0 1px #eef2f7;
+}
+
+.payment-row > * {
+  min-width: 0;
 }
 
 .payment-money {
@@ -306,15 +353,54 @@ button {
   font-size: 0.95rem;
   font-weight: 950;
   color: #0f172a;
+  overflow-wrap: anywhere;
+}
+
+.empty-state {
+  border: 1px dashed #cbd5e1;
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.82);
+  padding: 1.5rem;
+  text-align: center;
+  font-weight: 700;
+  color: #64748b;
+}
+
+@media (max-width: 1180px) {
+  .payment-row {
+    grid-template-columns: minmax(260px, 1.3fr) repeat(2, minmax(130px, 0.8fr));
+  }
+
+  .payment-row .payment-money:nth-of-type(3),
+  .payment-row .status-pill,
+  .payment-row .danger-button {
+    justify-self: start;
+  }
 }
 
 @media (max-width: 900px) {
+  .app-background {
+    background-attachment: scroll;
+  }
+
+  .payment-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .payment-form .primary-button {
+    width: 100%;
+  }
+
   .payment-row {
     grid-template-columns: 1fr 1fr;
   }
 
+  .payment-row > :first-child {
+    grid-column: 1 / -1;
+  }
+
   .payment-row .status-pill {
-    grid-column: 1;
+    grid-column: auto;
   }
 
   .payment-row .danger-button {
@@ -323,6 +409,11 @@ button {
 }
 
 @media (max-width: 520px) {
+  .background-overlay {
+    background:
+      linear-gradient(180deg, rgba(15, 23, 42, 0.1), rgba(244, 247, 251, 0.62));
+  }
+
   .panel {
     border-radius: 1.5rem;
     padding: 1rem;
@@ -330,6 +421,21 @@ button {
 
   .hero-card {
     border-radius: 1.65rem;
+    padding: 1.15rem;
+  }
+
+  .hero-title {
+    max-width: 11ch;
+    font-size: clamp(2rem, 10vw, 2.55rem);
+  }
+
+  .hero-description {
+    line-height: 1.55;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    min-width: 0;
   }
 
   .metric-card {
@@ -340,10 +446,34 @@ button {
   .member-spotlight {
     align-items: flex-start;
     flex-direction: column;
+    border-radius: 1.35rem;
+    padding: 1rem;
+  }
+
+  .member-spotlight img {
+    width: 100%;
+    height: auto;
+    max-height: 18rem;
+    border-radius: 1.35rem;
+  }
+
+  .payment-form {
+    grid-template-columns: 1fr;
   }
 
   .payment-row {
     grid-template-columns: 1fr;
+    border-radius: 1.25rem;
+    padding: 0.9rem;
+  }
+
+  .payment-row > :first-child {
+    align-items: flex-start;
+  }
+
+  .payment-row img {
+    width: 4.5rem;
+    height: 4.5rem;
   }
 
   .avatar-uploader {
@@ -357,5 +487,13 @@ button {
 
   .danger-button {
     width: 100%;
+  }
+
+  .primary-button {
+    width: 100%;
+  }
+
+  .eyebrow {
+    letter-spacing: 0.16em;
   }
 }
