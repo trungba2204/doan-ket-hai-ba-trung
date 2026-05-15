@@ -160,6 +160,19 @@ function getNotificationState(): NotificationState {
   return Notification.permission;
 }
 
+async function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) {
+    return false;
+  }
+
+  try {
+    await navigator.serviceWorker.register("/sw.js");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export default function Home() {
   const [members, setMembers] = useState<Member[]>(starterMembers);
   const [query, setQuery] = useState("Nguyễn Minh Quân");
@@ -190,6 +203,7 @@ export default function Home() {
 
     const frame = window.requestAnimationFrame(() => {
       setNotificationState(getNotificationState());
+      void registerServiceWorker();
 
       if (parsed?.members?.length) {
         setMembers(parsed.members);
@@ -244,7 +258,7 @@ export default function Home() {
   ).length;
 
   const showBirthdayNotification = useCallback(
-    (source: "auto" | "manual") => {
+    async (source: "auto" | "manual") => {
       if (birthdaysToday.length === 0) {
         setBirthdayStatus("Hôm nay chưa có sinh nhật thành viên nào.");
         return false;
@@ -258,12 +272,19 @@ export default function Home() {
       }
 
       const names = birthdaysToday.map((member) => member.name).join(", ");
-      new Notification("Sinh nhật hôm nay", {
+      const notification = {
         body: `Hôm nay là sinh nhật của ${names}. Nhớ chúc mừng nhé!`,
         icon: birthdaysToday[0].avatar,
         badge: birthdaysToday[0].avatar,
         tag: `hbt-birthday-${new Date().toISOString().slice(0, 10)}`,
-      });
+      };
+
+      if ("serviceWorker" in navigator) {
+        const registration = await navigator.serviceWorker.ready;
+        await registration.showNotification("Sinh nhật hôm nay", notification);
+      } else {
+        new Notification("Sinh nhật hôm nay", notification);
+      }
 
       setBirthdayStatus(
         source === "auto"
@@ -295,10 +316,11 @@ export default function Home() {
     }
 
     const frame = window.requestAnimationFrame(() => {
-      const sent = showBirthdayNotification("auto");
-      if (sent) {
-        window.localStorage.setItem(storageKey, "done");
-      }
+      void showBirthdayNotification("auto").then((sent) => {
+        if (sent) {
+          window.localStorage.setItem(storageKey, "done");
+        }
+      });
     });
 
     return () => window.cancelAnimationFrame(frame);
@@ -308,7 +330,15 @@ export default function Home() {
     if (!("Notification" in window)) {
       setNotificationState("unsupported");
       setBirthdayStatus(
-        "Trình duyệt này chưa hỗ trợ thông báo trên điện thoại.",
+        "Trình duyệt này chưa hỗ trợ Notification API. Với iPhone, hãy deploy bản mới, xoá icon cũ và thêm lại app vào màn hình chính.",
+      );
+      return;
+    }
+
+    const hasServiceWorker = await registerServiceWorker();
+    if (!hasServiceWorker) {
+      setBirthdayStatus(
+        "Chưa đăng ký được service worker. Hãy mở bản deploy HTTPS trên Vercel rồi thử lại.",
       );
       return;
     }
@@ -317,7 +347,7 @@ export default function Home() {
     setNotificationState(permission);
 
     if (permission === "granted") {
-      showBirthdayNotification("manual");
+      await showBirthdayNotification("manual");
       return;
     }
 

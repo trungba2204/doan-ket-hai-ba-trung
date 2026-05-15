@@ -15,6 +15,16 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Đoàn kết Hai Bà Trưng",
   description: "App quản lý thành viên, sinh nhật và tiền đội bóng.",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Hai Bà Trưng",
+  },
+  icons: {
+    icon: "/app-icon.svg",
+    apple: "/app-icon.svg",
+  },
 };
 
 export default function RootLayout({
