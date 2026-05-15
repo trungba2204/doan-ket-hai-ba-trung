@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Đoàn kết Hai Bà Trưng
 
-## Getting Started
+Ứng dụng Next.js quản lý thành viên và tiền đội bóng với giao diện responsive theo phong cách app mobile.
 
-First, run the development server:
+## Chức năng
+
+- Nhập tên thành viên để xem ngày sinh và ảnh đại diện.
+- Thêm thành viên mới với họ tên và ngày sinh.
+- Tính tiền đóng đội bóng theo mức 50.000đ/trận.
+- Cộng dồn nhiều lần đóng tiền cho từng người.
+- Bảng trạng thái hiển thị đã đóng, chưa đủ và số tiền còn thiếu.
+- Upload ảnh cầu thủ và lưu dữ liệu trên máy sau khi refresh.
+- Thông báo sinh nhật trên điện thoại/trình duyệt của người đang dùng app.
+
+## Chạy local
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Mở `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Thông báo sinh nhật trên điện thoại
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+App dùng Web Notification của trình duyệt. Người dùng bấm `Bật thông báo trên
+điện thoại` để cấp quyền. Sau đó, mỗi ngày khi mở app, nếu hôm đó là sinh nhật
+của thành viên nào thì app sẽ tự hiện thông báo trên thiết bị.
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Lưu ý: trên điện thoại, trình duyệt thường yêu cầu app chạy qua HTTPS. Với iPhone,
+thông báo web hoạt động tốt nhất khi thêm app vào màn hình chính.
