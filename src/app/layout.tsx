@@ -22,8 +22,13 @@ export const metadata: Metadata = {
     title: "Hai Bà Trưng",
   },
   icons: {
-    icon: "/app-icon.svg",
-    apple: "/app-icon.svg",
+    icon: [
+      { url: "/icon-512.jpg", sizes: "512x512", type: "image/jpeg" },
+      { url: "/7810e745-f1a8-4740-98a9-e17d21f50633.jpeg", sizes: "any" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.jpg", sizes: "180x180", type: "image/jpeg" },
+    ],
   },
 };
 
